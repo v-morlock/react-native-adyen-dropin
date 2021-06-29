@@ -62,6 +62,10 @@ struct ConfigurationParser {
         }
       }
     }
+
+    if let locale = config.value(forKey: "locale") as? String {
+      nextConfig.localizationParameters = LocalizationParameters(locale: locale)
+    }
     
     return nextConfig
   }
