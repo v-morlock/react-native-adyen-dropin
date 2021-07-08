@@ -2,11 +2,11 @@ import React from 'react';
 import { requireNativeComponent, ViewStyle } from 'react-native';
 
 export interface ConfigInterface {
-  card?: CardConfiguration;
-  applePay?: ApplePayConfiguration;
-  googlePay?: GooglePayConfiguration;
+  card?: CardConfiguration | undefined;
+  applePay?: ApplePayConfiguration | undefined;
+  googlePay?: GooglePayConfiguration | undefined;
   clientKey: string;
-  localizationParameters?: LocalizationParameters;
+  localizationParameters?: LocalizationParameters | undefined;
   payment: Payment;
 
   environment: 'test' | 'live';
@@ -17,11 +17,11 @@ export interface GooglePayConfiguration {
 }
 
 export interface CardConfiguration {
-  showsHolderNameField?: boolean;
-  showsStorePaymentMethodField?: boolean;
-  showsSecurityCodeField?: boolean;
-  billingAddress?: AddressFormType;
-  stored?: StoredCardConfiguration;
+  showsHolderNameField?: boolean | undefined;
+  showsStorePaymentMethodField?: boolean | undefined;
+  showsSecurityCodeField?: boolean | undefined;
+  billingAddress?: AddressFormType | undefined;
+  stored?: StoredCardConfiguration | undefined;
 }
 
 export enum AddressFormType {
@@ -31,7 +31,7 @@ export enum AddressFormType {
 }
 
 export interface StoredCardConfiguration {
-  showsSecurityCodeField?: boolean;
+  showsSecurityCodeField?: boolean | undefined;
 }
 
 export interface PKPaymentSummaryItem {
@@ -69,18 +69,18 @@ export interface Payment {
 }
 
 export type AdyenDropInProps = {
-  debug?: boolean;
-  visible?: boolean;
-  paymentMethods?: unknown;
+  debug?: boolean | undefined;
+  visible?: boolean | undefined;
+  paymentMethods?: unknown | undefined;
   paymentMethodsConfiguration: ConfigInterface;
-  paymentResponse?: any;
-  detailsResponse?: any;
-  onSubmit?: Function;
-  onAdditionalDetails?: Function;
-  onError?: Function;
-  onSuccess?: Function;
-  onClose?: Function;
-  style?: ViewStyle;
+  paymentResponse?: any | undefined;
+  detailsResponse?: any | undefined;
+  onSubmit?: Function | undefined;
+  onAdditionalDetails?: Function | undefined;
+  onError?: Function | undefined;
+  onSuccess?: Function | undefined;
+  onClose?: Function | undefined;
+  style?: ViewStyle | undefined;
 };
 
 export const AdyenDropInModule = requireNativeComponent<AdyenDropInProps>(
