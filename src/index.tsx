@@ -51,8 +51,9 @@ export interface LocalizationParameters {
    * The locale for external resources.
    * By default current locale is used.
    */
-  locale: string;
-  // todo tableName, keySeparator, bundle
+  locale?: string | undefined;
+  tableName?: string | undefined;
+  // todo keySeparator, bundle
 }
 
 export interface Amount {
