@@ -7,6 +7,7 @@ import com.adyen.checkout.components.model.payments.Amount
 import com.adyen.checkout.core.api.Environment
 import com.adyen.checkout.core.util.LocaleUtil
 import com.adyen.checkout.dropin.DropInConfiguration
+import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableMap
 import org.json.JSONObject
@@ -17,7 +18,7 @@ class ConfigurationParser(private val clientKey: String, context: ReactApplicati
   private val context: Context = context
 
   private  fun getShopperLocale(config: ReadableMap): Locale {
-    val providedShopperLocale = config.getString("shopperLocale")
+    val providedShopperLocale = config.getMap("localizationParameters")?.getString("locale")
 
     if (providedShopperLocale != null) {
       return LocaleUtil.fromLanguageTag(providedShopperLocale)
@@ -38,8 +39,8 @@ class ConfigurationParser(private val clientKey: String, context: ReactApplicati
 
   private fun getAmount(config: ReadableMap): Amount {
     val map = config.getMap("amount")
-    val value = map?.getInt("value") as? Int
-    val currencyCode = map?.getString("currencyCode") as? String
+    val value = map?.getInt("value") 
+    val currencyCode = map?.getString("currencyCode") 
     if (value != null && currencyCode != null) {
       val json = JSONObject()
         .put("value", value)
@@ -52,15 +53,51 @@ class ConfigurationParser(private val clientKey: String, context: ReactApplicati
     return Amount()
   }
 
-  fun parse(config: ReadableMap): DropInConfiguration {
+  private fun getCardConfig(config: ReadableMap): CardConfiguration{
+    val cardConfig = config.getMap("card")
+
     val shopperLocale = this.getShopperLocale(config)
     val environment = this.getEnvironment(config)
-    val amount = this.getAmount(config)
-    val cardConfiguration = CardConfiguration.Builder(shopperLocale, environment, this.clientKey)
-      .setShopperReference("test")
-      .setSupportedCardTypes(CardType.MASTERCARD, CardType.VISA)
-      .build()
+    val showsHolderNameField = cardConfig?.getBoolean("showsHolderNameField")
+    val showsStorePaymentMethodField = cardConfig?.getBoolean("showsStorePaymentMethodField")
+    val showsSecurityCodeField = cardConfig?.getBoolean("showsSecurityCodeField")
 
+    val builder =  CardConfiguration.Builder(shopperLocale, environment, this.clientKey)
+
+    if(showsHolderNameField != null){
+      builder.setHolderNameRequired(showsHolderNameField)
+    }
+    if(showsStorePaymentMethodField != null){
+      builder.setShowStorePaymentField(showsStorePaymentMethodField)
+    }
+    if(showsSecurityCodeField != null){
+      builder.setHideCvcStoredCard(!showsSecurityCodeField)
+    }
+
+    return builder.build()
+  }
+
+  private fun getGooglePayConfig(config: ReadableMap): GooglePayConfiguration?{
+    val merchantID = config.getMap("googlePay")?.getString("merchantID")
+    val shopperLocale = this.getShopperLocale(config)
+    val environment = this.getEnvironment(config)
+
+    if(merchantID == null){
+      return null
+    }
+
+    return GooglePayConfiguration.Builder(shopperLocale, environment, merchantID).build()
+  }
+
+  fun parse(config: ReadableMap): DropInConfiguration {
+    val environment = this.getEnvironment(config)
+
+    val shopperLocale = this.getShopperLocale(config)
+
+    val cardConfiguration = this.getCardConfig(config)
+
+    val amount = this.getAmount(config)
+  
     val builder = DropInConfiguration.Builder(
       this.context,
       AdyenDropInService::class.java,
@@ -70,6 +107,12 @@ class ConfigurationParser(private val clientKey: String, context: ReactApplicati
       .setEnvironment(environment)
       .setAmount(amount)
       .addCardConfiguration(cardConfiguration)
+
+    val googlePayConfig = this.getGooglePayConfig(config);
+
+    if(googlePayConfig != null){
+      builder.addGooglePayConfiguration(googlePayConfig)
+    }
 
     return builder.build()
   }

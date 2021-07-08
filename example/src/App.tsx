@@ -100,14 +100,14 @@ export default function App() {
         paymentMethodsConfiguration={{
           clientKey: config.clientKey,
           environment: config.environment,
-          countryCode: config.countryCode,
           applePay: {
-            amount: { value: 1, currencyCode: 'SEK' },
-            configuration: {
-              merchantId: config.applePay?.configuration?.merchantId,
-            },
+            merchantIdentifier: config.applePay?.configuration?.merchantId,
+            summaryItems: [{ label: 'Total', amount: 1, type: 'FINAL' }],
           },
-          amount: { value: 100, currencyCode: 'SEK' },
+          payment: {
+            amount: { value: 1, currencyCode: 'SEK' },
+            countryCode: config.countryCode,
+          },
         }}
         paymentResponse={paymentResponse}
         detailsResponse={detailsResponse}

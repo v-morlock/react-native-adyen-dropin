@@ -1,11 +1,77 @@
 import React from 'react';
 import { requireNativeComponent, ViewStyle } from 'react-native';
 
-type AdyenDropInProps = {
+export interface ConfigInterface {
+  card?: CardConfiguration;
+  applePay?: ApplePayConfiguration;
+  googlePay?: GooglePayConfiguration;
+  clientKey: string;
+  localizationParameters?: LocalizationParameters;
+  payment: Payment;
+
+  environment: 'test' | 'live';
+}
+
+export interface GooglePayConfiguration {
+  merchantID: string;
+}
+
+export interface CardConfiguration {
+  showsHolderNameField?: boolean;
+  showsStorePaymentMethodField?: boolean;
+  showsSecurityCodeField?: boolean;
+  billingAddress?: AddressFormType;
+  stored?: StoredCardConfiguration;
+}
+
+export enum AddressFormType {
+  FULL = 'full',
+  POSTAL_CODE = 'postalCode',
+  NONE = 'none',
+}
+
+export interface StoredCardConfiguration {
+  showsSecurityCodeField?: boolean;
+}
+
+export interface PKPaymentSummaryItem {
+  label: string;
+  amount: number;
+  type: 'FINAL' | 'PENDING';
+}
+
+export interface ApplePayConfiguration {
+  summaryItems: PKPaymentSummaryItem[];
+  merchantIdentifier: string;
+  // todo requiredBillingContactFields, requiredShippingContactFields
+}
+
+export interface LocalizationParameters {
+  /**
+   * The locale for external resources.
+   * By default current locale is used.
+   */
+  locale: string;
+  // todo tableName, keySeparator, bundle
+}
+
+export interface Amount {
+  /** The value of the amount in minor units. */
+  value: number;
+  /** The code of the currency in which the amount's value is specified */
+  currencyCode: string;
+}
+
+export interface Payment {
+  amount: Amount;
+  countryCode: string;
+}
+
+export type AdyenDropInProps = {
   debug?: boolean;
   visible?: boolean;
-  paymentMethods?: any;
-  paymentMethodsConfiguration?: any;
+  paymentMethods?: unknown;
+  paymentMethodsConfiguration: ConfigInterface;
   paymentResponse?: any;
   detailsResponse?: any;
   onSubmit?: Function;
@@ -33,8 +99,8 @@ const AdyenDropIn = React.forwardRef(
     {
       debug = false,
       visible = false,
-      paymentMethods = {},
-      paymentMethodsConfiguration = {},
+      paymentMethods,
+      paymentMethodsConfiguration,
       paymentResponse,
       detailsResponse,
       onSubmit,
@@ -73,7 +139,7 @@ const AdyenDropIn = React.forwardRef(
         ref={forwardedRef}
         debug={debug}
         visible={visible}
-        paymentMethods={paymentMethods}
+        paymentMethods={paymentMethods ?? {}}
         paymentMethodsConfiguration={paymentMethodsConfiguration}
         paymentResponse={paymentResponse}
         detailsResponse={detailsResponse}
