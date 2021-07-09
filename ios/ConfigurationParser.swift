@@ -66,7 +66,7 @@ struct ConfigurationParser {
         if let applePayConfig = config.value(forKey: "applePay") as? NSDictionary {
             
             let rawItems = applePayConfig.value(forKey: "summaryItems") as! [NSDictionary]
-            let merchantIdentifier = applePayConfig.value(forKey: "merchantId") as! String
+            let merchantIdentifier = applePayConfig.value(forKey: "merchantIdentifier") as! String
             var summaryItems: [PKPaymentSummaryItem] = [];
             
             for item in rawItems {
