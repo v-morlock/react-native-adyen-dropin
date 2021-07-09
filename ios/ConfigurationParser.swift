@@ -86,7 +86,7 @@ struct ConfigurationParser {
         if let localizationParameters = config.value(forKey: "localizationParameters") as? NSDictionary{
             let locale = localizationParameters.value(forKey: "locale") as? String
             let tableName = localizationParameters.value(forKey: "tableName") as? String
-            nextConfig.localizationParameters = LocalizationParameters(locale: locale, tableName: tableName)
+            nextConfig.localizationParameters = LocalizationParameters(tableName: tableName, locale: locale)
         }
         
         // payment
