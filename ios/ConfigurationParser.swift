@@ -11,7 +11,7 @@ import PassKit
 func parseConfig(_ config: NSDictionary) -> DropInComponent.Configuration {
     
     let environment = getEnvironment(config.value(forKey: "environment") as! String)
-    let clientKey = config.value(forKey: "environment") as! String
+    let clientKey = config.value(forKey: "clientKey") as! String
     
     let nextConfig = DropInComponent.Configuration(apiContext: APIContext(environment: environment, clientKey: clientKey))
     
