@@ -38,9 +38,10 @@ class ConfigurationParser(private val clientKey: String, context: ReactApplicati
   }
 
   private fun getAmount(config: ReadableMap): Amount {
-    val map = config.getMap("amount")
-    val value = map?.getInt("value") 
-    val currencyCode = map?.getString("currencyCode") 
+    val paymentMap = config.getMap("payment")
+    val amountMap = paymentMap?.getMap("amount")
+    val value = amountMap?.getInt("value")
+    val currencyCode = amountMap?.getString("currencyCode")
     if (value != null && currencyCode != null) {
       val json = JSONObject()
         .put("value", value)
