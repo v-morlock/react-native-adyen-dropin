@@ -56,12 +56,14 @@ class ConfigurationParser(private val clientKey: String, context: ReactApplicati
 
   private fun getCardConfig(config: ReadableMap): CardConfiguration{
     val cardConfig = config.getMap("card")
+    val storedCardConfig = cardConfig?.getMap("stored");
 
     val shopperLocale = this.getShopperLocale(config)
     val environment = this.getEnvironment(config)
     val showsHolderNameField = cardConfig?.getBoolean("showsHolderNameField")
     val showsStorePaymentMethodField = cardConfig?.getBoolean("showsStorePaymentMethodField")
     val showsSecurityCodeField = cardConfig?.getBoolean("showsSecurityCodeField")
+    val showsStoredSecurityCodeField = storedCardConfig?.getBoolean("showsSecurityCodeField")
 
     val builder =  CardConfiguration.Builder(shopperLocale, environment, this.clientKey)
 
@@ -72,7 +74,11 @@ class ConfigurationParser(private val clientKey: String, context: ReactApplicati
       builder.setShowStorePaymentField(showsStorePaymentMethodField)
     }
     if(showsSecurityCodeField != null){
-      builder.setHideCvcStoredCard(!showsSecurityCodeField)
+      builder.setHideCvc(!showsSecurityCodeField)
+    }
+
+    if(showsStoredSecurityCodeField != null) {
+      builder.setHideCvcStoredCard(!showsStoredSecurityCodeField)
     }
 
     return builder.build()
@@ -98,7 +104,7 @@ class ConfigurationParser(private val clientKey: String, context: ReactApplicati
     val cardConfiguration = this.getCardConfig(config)
 
     val amount = this.getAmount(config)
-  
+
     val builder = DropInConfiguration.Builder(
       this.context,
       AdyenDropInService::class.java,
