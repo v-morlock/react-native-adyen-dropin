@@ -1,21 +1,44 @@
-import {
-  AddressFormType,
-  ConfigInterface,
-} from '@ancon/react-native-adyen-dropin';
+interface CardConfiguration {
+  showsHolderNameField: boolean;
+  showsStorePaymentMethodField: boolean;
+  showsSecurityCodeField: boolean;
+}
 
-const config: ConfigInterface = {
+interface Amount {
+  value: number;
+  currencyCode: string;
+}
+
+interface ApplePayConfiguration {
+  amount?: {
+    value: number;
+    currency: string;
+  };
+  countryCode?: string;
+  configuration?: {
+    merchantName?: string; // Name to be displayed on the form
+    merchantId: string; // Your Apple merchant identifier
+  };
+}
+
+interface ConfigInterface {
+  clientKey: string;
+  environment: 'test' | 'live';
+  countryCode: string;
+  payment?: Amount;
+  card?: CardConfiguration;
+  applePay?: ApplePayConfiguration;
+}
+
+const config = <ConfigInterface>{
   clientKey: '<enter clientKey here>',
   environment: 'test',
-  card: {
-    billingAddress: AddressFormType.FULL,
-    showsSecurityCodeField: true,
-    stored: {
-      showsSecurityCodeField: false,
+  countryCode: '<enter countryCode here>',
+  applePay: {
+    label: '<enter company name here>',
+    configuration: {
+      merchantId: '<enter merchantId here>',
     },
-  },
-  payment: {
-    amount: { currencyCode: 'EUR', value: 20 },
-    countryCode: 'DE-de',
   },
 };
 
