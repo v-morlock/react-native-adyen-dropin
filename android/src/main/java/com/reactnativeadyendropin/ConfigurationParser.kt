@@ -7,7 +7,6 @@ import com.adyen.checkout.components.model.payments.Amount
 import com.adyen.checkout.core.api.Environment
 import com.adyen.checkout.core.util.LocaleUtil
 import com.adyen.checkout.dropin.DropInConfiguration
-import com.adyen.checkout.googlepay.GooglePayConfiguration
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableMap
 import com.reactnativeadyendropin.service.AdyenDropInService
@@ -82,12 +81,6 @@ class ConfigurationParser(private val clientKey: String, context: ReactApplicati
       .setEnvironment(environment)
       .setAmount(amount)
       .addCardConfiguration(cardConfiguration)
-
-    val googlePayConfig = this.getGooglePayConfig(config);
-
-    if(googlePayConfig != null){
-      builder.addGooglePayConfiguration(googlePayConfig)
-    }
 
     return builder.build()
   }
