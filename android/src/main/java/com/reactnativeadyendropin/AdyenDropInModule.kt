@@ -10,8 +10,10 @@ import com.adyen.checkout.core.model.getStringOrNull
 import com.adyen.checkout.dropin.DropIn
 import com.adyen.checkout.dropin.DropInConfiguration
 import com.adyen.checkout.dropin.DropInResult
+import com.adyen.checkout.dropin.service.DropInServiceResult
 import com.facebook.react.bridge.*
 import com.reactnativeadyendropin.data.storage.MemoryStorage
+import com.reactnativeadyendropin.service.AdyenDropInService
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -117,6 +119,42 @@ class AdyenDropInModule(private val reactContext : ReactApplicationContext): Rea
   }
 
   @ReactMethod
+  fun setSubmitCallback(callback: Callback?) {
+    Log.d(TAG, "Called setSubmitCallback")
+    memoryStorage.onSubmitCallback = callback
+  }
+
+  @ReactMethod
+  fun setAdditionalDetailsCallback(callback: Callback?) {
+    Log.d(TAG, "Called setAdditionalDetailsCallback")
+    memoryStorage.onAdditionalDetailsCallback = callback
+  }
+
+  @ReactMethod
+  fun setPaymentResponse(paymentResponse: ReadableMap?) {
+    Log.d(TAG, "Called setPaymentResponse")
+    if (paymentResponse == null) return
+
+    try {
+      AdyenDropInService.handleAsyncResponse(paymentResponse)
+    } catch (err: Exception) {
+      this.handleError(err.message  ?: "Unknown error in setPaymentResponse")
+    }
+  }
+
+  @ReactMethod
+  fun setDetailsResponse(detailsResponse: ReadableMap?) {
+    Log.d(TAG, "Called setDetailsResponse")
+    if (detailsResponse == null) return
+
+    try {
+      AdyenDropInService.handleAsyncResponse(detailsResponse)
+    } catch (err: Exception) {
+      this.handleError(err.message  ?: "Unknown error in setDetailsResponse")
+    }
+  }
+
+  @ReactMethod
   fun start(paymentMethodsResponse: ReadableMap, resolveCallback: Callback, rejectCallback: Callback) {
     Log.d(TAG, "Called start")
 
@@ -154,7 +192,7 @@ class AdyenDropInModule(private val reactContext : ReactApplicationContext): Rea
 
   override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {
     Log.d(TAG, "onActivityResult - ${activity}, ${requestCode}, ${resultCode}, ${data}")
-    
+
     val dropInResult = DropIn.handleActivityResult(requestCode, resultCode, data) ?: return
     when (dropInResult) {
       is DropInResult.Error -> handleError(dropInResult.reason)
@@ -165,7 +203,7 @@ class AdyenDropInModule(private val reactContext : ReactApplicationContext): Rea
         try {
           val json = JSONObject(dropInResult.result)
           if (json.getStringOrNull("resultCode") == null) {
-            handleError(json.getStringOrNull("message") ?: json.getStringOrNull("refusalReason") ?: "Unknown error")
+            handleError(dropInResult.result ?: json.getStringOrNull("message") ?: json.getStringOrNull("refusalReason") ?: "Unknown error")
           } else {
              handleFinished(dropInResult.result)
           }
